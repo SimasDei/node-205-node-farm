@@ -36,6 +36,10 @@ const url = require('url');
  * @module - Node Http Networking capabilities
  */
 const http = require('http');
+
+const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8');
+const dataObj = JSON.parse(data);
+
 const server = http.createServer((req, res) => {
   /**
    * @module - Url and routing
@@ -49,6 +53,12 @@ const server = http.createServer((req, res) => {
     case '/product':
       res.end('This is Product');
       break;
+    case '/api':
+      res.writeHead(200, {
+        'Content-type': 'application/json',
+      });
+      res.end(data);
+      break;
     default:
       res.writeHead(404, {
         'Content-type': 'text/html',
@@ -57,8 +67,6 @@ const server = http.createServer((req, res) => {
       res.end('<h1>Page not found</h1>');
       break;
   }
-
-  res.end('Ahoy from the server o/');
 });
 
 server.listen(8000, '127.0.0.1', () => {
