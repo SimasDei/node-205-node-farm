@@ -3,6 +3,7 @@
  */
 const hello = 'Ahoy Sailor o/';
 const fs = require('fs');
+const url = require('url');
 
 /**
  * @way - Blocking / Synchronous
@@ -36,6 +37,27 @@ const fs = require('fs');
  */
 const http = require('http');
 const server = http.createServer((req, res) => {
+  /**
+   * @module - Url and routing
+   */
+
+  const pathName = req.url;
+  switch (pathName) {
+    case '/overview' || '/':
+      res.end('This is the Overview');
+      break;
+    case '/product':
+      res.end('This is Product');
+      break;
+    default:
+      res.writeHead(404, {
+        'Content-type': 'text/html',
+        'madeup-header': 'ahoySailor o/',
+      });
+      res.end('<h1>Page not found</h1>');
+      break;
+  }
+
   res.end('Ahoy from the server o/');
 });
 
