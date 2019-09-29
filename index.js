@@ -68,14 +68,14 @@ const server = http.createServer((req, res) => {
   /**
    * @module - Url and routing
    */
-
-  const pathName = req.url;
-  switch (pathName) {
+  const { query, pathname } = url.parse(req.url, true);
+  let output;
+  switch (pathname) {
     case '/':
       res.writeHead(200, { 'Content-type': 'text/html' });
 
       const cardsHtml = dataObj.map(product => replaceTemplate(tempCard, product)).join('');
-      const output = tempOverview.replace('{%PRODUCT_CARDS%}', cardsHtml);
+      output = tempOverview.replace('{%PRODUCT_CARDS%}', cardsHtml);
 
       res.end(output);
       break;
@@ -84,7 +84,10 @@ const server = http.createServer((req, res) => {
       res.end(tempOverview);
       break;
     case '/product':
-      res.end('This is Product');
+      const product = dataObj[query.id];
+      output = replaceTemplate(tempProduct, product);
+      res.writeHead(200, { 'Content-type': 'text/html' });
+      res.end(output);
       break;
     case '/api':
       res.writeHead(200, {
