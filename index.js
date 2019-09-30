@@ -1,9 +1,12 @@
+const hello = 'Ahoy Sailor o/';
+
 /**
  * @module - Node File System
  */
-const hello = 'Ahoy Sailor o/';
 const fs = require('fs');
+
 const url = require('url');
+const slugify = require('slugify');
 const replaceTemplate = require(`${__dirname}/modules/replaceTemplate`);
 
 /**
@@ -33,6 +36,7 @@ const replaceTemplate = require(`${__dirname}/modules/replaceTemplate`);
 
 //////////////////////////////////////////////////
 
+
 /**
  * @module - Node Http Networking capabilities
  */
@@ -43,6 +47,8 @@ const http = require('http');
  */
 const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8');
 const dataObj = JSON.parse(data);
+const slugs = dataObj.map(el => slugify(el.productName, { lower: true }));
+console.log(slugs);
 
 /**
  * @templates - Overview, Card, Product
@@ -57,18 +63,17 @@ const server = http.createServer((req, res) => {
    */
   const { query, pathname } = url.parse(req.url, true);
   let output;
+  const cardsHtml = dataObj.map(product => replaceTemplate(tempCard, product)).join('');
   switch (pathname) {
     case '/':
       res.writeHead(200, { 'Content-type': 'text/html' });
-
-      const cardsHtml = dataObj.map(product => replaceTemplate(tempCard, product)).join('');
       output = tempOverview.replace('{%PRODUCT_CARDS%}', cardsHtml);
-
       res.end(output);
       break;
     case '/overview':
       res.writeHead(200, { 'Content-type': 'text/html' });
-      res.end(tempOverview);
+      output = tempOverview.replace('{%PRODUCT_CARDS%}', cardsHtml);
+      res.end(output);
       break;
     case '/product':
       const product = dataObj[query.id];
@@ -92,6 +97,8 @@ const server = http.createServer((req, res) => {
   }
 });
 
-server.listen(8000, '127.0.0.1', () => {
-  console.log('Server started, captain o/');
+const PORT = 8000;
+
+server.listen(PORT, '127.0.0.1', () => {
+  console.log(`${hello} runnin' on http://localhost:${PORT}`);
 });
